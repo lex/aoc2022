@@ -12,13 +12,11 @@ for line in lines:
 
     range_first = range(int(start_first), int(end_first) + 1)
     range_second = range(int(start_second), int(end_second) + 1)
-    list_first = list(range_first)
-    list_second = list(range_second)
 
-    if all(i in list_second for i in list_first) or all(i in list_first for i in list_second):
+    if all(i in range_second for i in range_first) or all(i in range_first for i in range_second):
         pairs += 1
 
-    if any(i in list_second for i in list_first) or any(i in list_first for i in list_second):
+    if any(i in range_second for i in range_first):
         total_overlaps += 1
 
 print(f'part 1: {pairs}')
