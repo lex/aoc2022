@@ -81,6 +81,20 @@ def find_small_directories(directory, max_size):
     return small_directories
 
 
+def find_smallest_directory_for_deletion(directory, min_size):
+    smallest_directory = directory
+
+    if directory.size() >= min_size and directory.size() < smallest_directory.size():
+        smallest_directory = directory
+
+    for subdirectory in directory.subdirectories:
+        d = find_smallest_directory_for_deletion(subdirectory, min_size)
+        if d.size() < smallest_directory.size() and d.size() >= min_size:
+            smallest_directory = d
+
+    return smallest_directory
+
+
 def main():
     global file_system, listing_directory
     with open('input.txt') as f:
@@ -96,7 +110,17 @@ def main():
             parse_directory(line)
 
     small_directories = find_small_directories(file_system, 100000)
-    print(sum(map(lambda x: x.size(), small_directories)))
+    sum_of_small_directories = sum(map(lambda x: x.size(), small_directories))
+    print(f'part 1: {sum_of_small_directories}')
+
+    total_space = 70000000
+    needed_space = 30000000
+    available_space = total_space - file_system.size()
+    directory_size_at_least = needed_space - available_space
+
+    directory_to_be_deleted = find_smallest_directory_for_deletion(
+        file_system, directory_size_at_least)
+    print(f'part 2: {directory_to_be_deleted.size()}')
 
 
 if __name__ == '__main__':
