@@ -2,60 +2,78 @@ with open('input.txt') as f:
     lines = f.readlines()
 
 
-class RopePart:
-    def __init__(self, x, y):
+class Knot:
+    def __init__(self, x, y, next_part=None):
         self.x = x
         self.y = y
+        self.next_part = next_part
+        self.positions = {}
+
+    def pull_next(self):
+        if not self.next_part:
+            return
+
+        dx = self.x - self.next_part.x
+        dy = self.y - self.next_part.y
+
+        if dx > 1:
+            self.next_part.x += 1
+            self.next_part.y = self.y
+        elif dx < -1:
+            self.next_part.x -= 1
+            self.next_part.y = self.y
+        elif dy > 1:
+            self.next_part.y += 1
+            self.next_part.x = self.x
+        elif dy < -1:
+            self.next_part.y -= 1
+            self.next_part.x = self.x
+
+        self.next_part.pull_next()
+        self.next_part.update_positions()
+
+    def update_positions(self):
+        self.positions[(self.x, self.y)] = 1
 
 
-class Rope:
-    def __init__(self, head, tail):
-        self.head = head
-        self.tail = tail
+part_1_tail = Knot(0, 0)
+part_1_head = Knot(0, 0, part_1_tail)
 
+knots = []
+for i in range(0, 10):
+    knots.append(Knot(0, 0, knots[-1] if len(knots) else None))
 
-head = RopePart(0, 0)
-tail = RopePart(0, 0)
-rope = Rope(head, tail)
+part_2_head = knots[-1]
+part_2_tail = knots[0]
 
-tail_positions = {}
+heads = [part_1_head, part_2_head]
+tails = [part_1_tail, part_2_tail]
 
 for line in lines:
     direction, amount = line.strip().split(' ')
     amount = int(amount)
 
-    print(f'moving {amount} steps to {direction}')
     for i in range(0, amount):
         if direction == 'U':
             # up
-            rope.head.y += 1
+            for head in heads:
+                head.y += 1
         elif direction == 'D':
             # down
-            rope.head.y -= 1
+            for head in heads:
+                head.y -= 1
         elif direction == 'L':
             # left
-            rope.head.x -= 1
+            for head in heads:
+                head.x -= 1
         elif direction == 'R':
             # right
-            rope.head.x += 1
+            for head in heads:
+                head.x += 1
 
-        # move tail if d > 2
-        dx = rope.head.x - rope.tail.x
-        dy = rope.head.y - rope.tail.y
+        for head in heads:
+            head.pull_next()
 
-        if dx > 1:
-            rope.tail.x += 1
-            rope.tail.y = rope.head.y
-        elif dx < -1:
-            rope.tail.x -= 1
-            rope.tail.y = rope.head.y
-        elif dy > 1:
-            rope.tail.y += 1
-            rope.tail.x = rope.head.x
-        elif dy < -1:
-            rope.tail.y -= 1
-            rope.tail.x = rope.head.x
 
-        tail_positions[(rope.tail.x, rope.tail.y)] = 1
-
-print(len(tail_positions))
+for part in [1, 2]:
+    print(f'part {part}: {len(tails[part - 1].positions)}')
