@@ -16,10 +16,18 @@ x = 1
 cycle = 1
 instructions = []
 interesting_cycles = [20, 60, 100, 140, 180, 220]
-interesting_cycles = [20, 60, 100, 140, 180, 220]
 interesting_cycles_signal_strength_sum = 0
+crt_frame = ''
+crt_row = ''
 
 while True:
+    if len(crt_row) == 40:
+        crt_frame += f'{crt_row}\n'
+        crt_row = ''
+
+    crt_index = len(crt_row)
+    crt_row += '#' if crt_index in range(x - 1, x + 2) else '.'
+
     if not lines and not instructions:
         break
 
@@ -49,3 +57,4 @@ while True:
 
 
 print(f'part 1: {interesting_cycles_signal_strength_sum}')
+print(f'part 2:\n{crt_frame}')
