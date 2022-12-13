@@ -1,4 +1,5 @@
 import collections
+import math
 
 with open('input.txt') as f:
     lines = f.readlines()
@@ -19,7 +20,10 @@ def bfs(graph, start, end):
                 if neighbor != end:
                     q.append((neighbor, next_steps))
 
-    return shortest[end]
+    try:
+        return shortest[end]
+    except:
+        return math.inf
 
 
 def create_neighbors(x, y):
@@ -59,13 +63,19 @@ def main():
     start = 0
     end = 0
 
+    possible_starting_points = []
+
     for y in range(0, len(lines)):
         for x in range(0, len(lines[0]) - 1):
             c = lines[y][x]
 
             if c == 'S':
                 start = (y, x)
+                c = 'a'
                 lines[y] = lines[y].replace('S', 'a')
+
+            if c == 'a':
+                possible_starting_points.append((y, x))
 
             if c == 'E':
                 end = (y, x)
@@ -80,6 +90,14 @@ def main():
 
     b = bfs(graph, start, end)
     print(f'part 1: {b}')
+
+    shortest = math.inf
+
+    for s in possible_starting_points:
+        l = bfs(graph, s, end)
+        shortest = min(l, shortest)
+
+    print(f'part 2: {shortest}')
 
 
 if __name__ == '__main__':
